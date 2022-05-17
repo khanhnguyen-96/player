@@ -4,7 +4,7 @@ import 'package:app/utils/preferences.dart' as preferences;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-enum ThumbnailSize { sm, md, lg, xl }
+enum ThumbnailSize { xs, s, md, lg, xl }
 
 class SongThumbnail extends StatelessWidget {
   final Song song;
@@ -14,7 +14,7 @@ class SongThumbnail extends StatelessWidget {
   const SongThumbnail({
     Key? key,
     required this.song,
-    this.size = ThumbnailSize.sm,
+    this.size = ThumbnailSize.xs,
     this.playing = false,
   }) : super(key: key);
 
@@ -27,17 +27,14 @@ class SongThumbnail extends StatelessWidget {
             song: song,
             borderRadius: borderRadius,
           )
-        : ClipRRect(
-            borderRadius: BorderRadius.circular(borderRadius),
-            child: CachedNetworkImage(
-              fit: BoxFit.cover,
-              width: width,
-              height: height,
-              placeholder: (_, __) => defaultImage,
-              errorWidget: (_, __, ___) => defaultImage,
-              imageUrl: song.imageUrl ?? preferences.defaultImageUrl,
-            ),
-          );
+        : CachedNetworkImage(
+          fit: BoxFit.cover,
+          width: width,
+          height: height,
+          placeholder: (_, __) => defaultImage,
+          errorWidget: (_, __, ___) => defaultImage,
+          imageUrl: song.imageUrl ?? preferences.defaultImageUrl,
+        );
   }
 
   double get width {
@@ -48,6 +45,8 @@ class SongThumbnail extends StatelessWidget {
         return 144;
       case ThumbnailSize.xl:
         return 256;
+      case ThumbnailSize.s:
+        return 88;
       default:
         return 48;
     }
@@ -61,6 +60,8 @@ class SongThumbnail extends StatelessWidget {
         return 16;
       case ThumbnailSize.xl:
         return 20;
+      case ThumbnailSize.s:
+        return 16;
       default:
         return 8;
     }

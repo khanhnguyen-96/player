@@ -1,3 +1,5 @@
+import 'package:app/constants/colors.dart';
+import 'package:app/constants/images.dart';
 import 'package:app/extensions/assets_audio_player.dart';
 import 'package:app/mixins/stream_subscriber.dart';
 import 'package:app/models/song.dart';
@@ -77,16 +79,29 @@ class _SongRowState extends State<SongRow> {
             ? SongRowTrackNumber(song: widget.song)
             : SongRowThumbnail(song: widget.song),
         minLeadingWidth: widget.listContext == SongListContext.album ? 0 : null,
-        title: Text(widget.song.title, overflow: TextOverflow.ellipsis),
+        title: Text(
+          widget.song.title,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.subtitle2?.copyWith(
+              fontWeight: FontWeight.w600, color: AppColors.dullWhite),
+        ),
         subtitle: Text(
           subtitle,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(color: Colors.white60),
+          style: Theme.of(context)
+              .textTheme
+              .subtitle1
+              ?.copyWith(fontSize: 12, color: AppColors.gray),
         ),
-        trailing: SongRowTrailingActions(
-          song: widget.song,
-          listContext: widget.listContext,
-          index: widget.index,
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SongRowTrailingActions(
+              song: widget.song,
+              listContext: widget.listContext,
+              index: widget.index,
+            ),
+          ],
         ),
       ),
     );
@@ -177,10 +192,9 @@ class SongRowTrailingActions extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        SongCacheIcon(song: song),
         if (listContext == SongListContext.queue)
-          // In a queue, the trailing control is the Drag icon
-          // In other "standard" queues, it's the Actions menu trigger
+        // In a queue, the trailing control is the Drag icon
+        // In other "standard" queues, it's the Actions menu trigger
           ReorderableDragStartListener(
             index: index,
             child: Container(
@@ -193,7 +207,7 @@ class SongRowTrailingActions extends StatelessWidget {
           )
         else
           IconButton(
-            icon: const Icon(CupertinoIcons.ellipsis, size: 20),
+            icon: iconMore,
             onPressed: () => router.showActionSheet(
               context,
               song: song,

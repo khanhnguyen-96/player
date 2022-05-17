@@ -52,7 +52,8 @@ class _RootScreenState extends State<RootScreen> {
       child: Scaffold(
         body: Stack(
           children: <Widget>[
-            CupertinoTabScaffold(
+            const HomeScreen(),
+            /*CupertinoTabScaffold(
               tabBuilder: (_, index) {
                 return CupertinoTabView(builder: (_) => _widgetOptions[index]);
               },
@@ -78,7 +79,7 @@ class _RootScreenState extends State<RootScreen> {
                 currentIndex: _selectedIndex,
                 onTap: _onItemTapped,
               ),
-            ),
+            ),*/
             Positioned(
               // 50 is the standard iOS (10) tab bar height.
               bottom: 50 + MediaQuery.of(context).padding.bottom,

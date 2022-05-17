@@ -1,3 +1,5 @@
+import 'package:app/constants/colors.dart';
+import 'package:app/constants/images.dart' as images;
 import 'package:app/constants/dimensions.dart';
 import 'package:app/models/song.dart';
 import 'package:app/providers/album_provider.dart';
@@ -12,8 +14,12 @@ import 'package:app/ui/screens/root.dart';
 import 'package:app/ui/screens/songs.dart';
 import 'package:app/ui/widgets/album_card.dart';
 import 'package:app/ui/widgets/artist_card.dart';
+import 'package:app/ui/widgets/bigger_3_row_item.dart';
+import 'package:app/ui/widgets/bigger_song_list.dart';
 import 'package:app/ui/widgets/bottom_space.dart';
 import 'package:app/ui/widgets/horizontal_card_scroller.dart';
+import 'package:app/ui/widgets/rounded_tab_bar_decoration.dart';
+import 'package:app/ui/widgets/simple_artist_list.dart';
 import 'package:app/ui/widgets/simple_song_list.dart';
 import 'package:app/ui/widgets/song_card.dart';
 import 'package:app/ui/widgets/typography.dart';
@@ -21,10 +27,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
   static const routeName = '/home';
 
-  const HomeScreen({Key? key}) : super(key: key);
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  final List<Tab> tabs = const <Tab>[
+    Tab(text: "Home"),
+    Tab(text: "Songs"),
+    Tab(text: "Albums"),
+    Tab(text: "Artists"),
+  ];
+
+  TabController? _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(vsync: this, length: tabs.length);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +73,8 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 32),
               const Text(
                 'Looks like your library is empty. '
-                'You can add songs using the web interface or via the '
-                'command line.',
+                    'You can add songs using the web interface or via the '
+                    'command line.',
                 style: TextStyle(color: Colors.white54),
               ),
               const SizedBox(height: 32),
@@ -78,25 +104,55 @@ class HomeScreen extends StatelessWidget {
     } else {
       homeBlocks = <Widget>[
         Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.horizontalPadding,
+          padding: const EdgeInsets.only(
+              left: AppDimensions.horizontalPadding,
+              right: AppDimensions.horizontalPadding,
+              bottom: 12,
+              top: 19),
+          child: SimpleSongList(
+            headingText: "Most played",
+            songs: songProvider.mostPlayed().take(3),
           ),
-          child: SimpleSongList(songs: songProvider.recentlyAdded()),
-        ),
-        HorizontalCardScroller(
-          headingText: 'Most played songs',
-          cards: <Widget>[
-            ...songProvider.mostPlayed().map((song) => SongCard(song: song)),
-            PlaceholderCard(
-              icon: CupertinoIcons.music_note,
-              onPressed: () => Navigator.of(context)
-                  .push(CupertinoPageRoute(builder: (_) => SongsScreen())),
-            ),
-          ],
         ),
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.horizontalPadding,
+            vertical: 12,
+          ),
+          child: SimpleSongList(
+            headingText: "Recently played",
+            songs: songProvider.recentlyAdded().take(3),
+          ),
+        ),
+        //TODO placeholder only
+        Padding(
+          padding: const EdgeInsets.only(
+            left: AppDimensions.horizontalPadding,
+            right: AppDimensions.horizontalPadding,
+            top: 12,
+            bottom: 8,
+          ),
+          child: BiggerSongList(
+            headingText: "Recently added",
+            songs: songProvider.recentlyAdded().take(4),
+          ),
+        ),
+        //TODO placeholder only
+        Padding(
+          padding: const EdgeInsets.only(
+            left: AppDimensions.horizontalPadding,
+            right: AppDimensions.horizontalPadding,
+            top: 0,
+            bottom: 12,
+          ),
+          child: SimpleSongList(
+            songs: songProvider.recentlyAdded().take(3),
+          ),
+        ),
+        /*Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.horizontalPadding,
+            vertical: 12,
           ),
           child: SimpleSongList(
             songs: interactionProvider.getRandomFavorites(limit: 5),
@@ -104,8 +160,8 @@ class HomeScreen extends StatelessWidget {
             onHeaderTap: () => Navigator.of(context)
                 .push(CupertinoPageRoute(builder: (_) => FavoritesScreen())),
           ),
-        ),
-        HorizontalCardScroller(
+        ),*/
+        /*HorizontalCardScroller(
           headingText: 'Top albums',
           cards: <Widget>[
             ...albumProvider
@@ -117,8 +173,20 @@ class HomeScreen extends StatelessWidget {
                   .push(CupertinoPageRoute(builder: (_) => AlbumsScreen())),
             ),
           ],
+        ),*/
+        Padding(
+          padding: const EdgeInsets.only(
+            left: AppDimensions.horizontalPadding,
+            right: AppDimensions.horizontalPadding,
+            top: 0,
+            bottom: 12,
+          ),
+          child: SimpleArtistList(
+            headingText: 'Top artists',
+            artists: artistProvider.mostPlayed().take(3),
+          ),
         ),
-        HorizontalCardScroller(
+        /*HorizontalCardScroller(
           headingText: 'Top artists',
           cards: <Widget>[
             ...artistProvider
@@ -130,24 +198,39 @@ class HomeScreen extends StatelessWidget {
                   .push(CupertinoPageRoute(builder: (_) => ArtistsScreen())),
             ),
           ],
-        ),
-        Padding(
+        ),*/
+        /*Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.horizontalPadding,
+            vertical: 12,
           ),
           child: SimpleSongList(
             songs: songProvider.leastPlayed(limit: 5),
             headingText: 'Hidden gems',
           ),
+        ),*/
+        Padding(
+          padding: const EdgeInsets.only(
+            left: AppDimensions.horizontalPadding,
+            right: AppDimensions.horizontalPadding,
+            top: 12,
+            bottom: 8,
+          ),
+          child: BiggerSongList(
+            headingText: "Top albums",
+            children: albumProvider
+                .mostPlayed()
+                .take(4)
+                .map((e) => Bigger3RowDetailItem(
+              title: e.name,
+              subtitle: e.artist.name,
+              //TODO placeholder only
+              caption: "5 song - 20:10 - 12443 plays",
+            ))
+                .toList(growable: false),
+          ),
         ),
-      ]
-          .map(
-            (widget) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: widget,
-            ),
-          )
-          .toList();
+      ];
     }
 
     return Scaffold(
@@ -157,16 +240,48 @@ class HomeScreen extends StatelessWidget {
         ),
         child: CustomScrollView(
           slivers: <Widget>[
-            CupertinoSliverNavigationBar(
+            SliverAppBar(
               backgroundColor: Colors.black,
-              largeTitle: const LargeTitle(text: 'Home'),
-              trailing: IconButton(
-                onPressed: () => Navigator.of(context).push(
-                  new CupertinoPageRoute(builder: (_) => const ProfileScreen()),
+              leading: const Icon(
+                Icons.menu,
+                color: AppColors.dullWhite,
+              ),
+              actions: [
+                images.iconSearch,
+                IconButton(
+                  onPressed: () => Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (_) => const ProfileScreen()),
+                  ),
+                  icon: images.iconProfile,
                 ),
-                icon: const Icon(
-                  CupertinoIcons.person_alt_circle,
-                  size: 24,
+              ],
+              title: _buildTitle(),
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(kToolbarHeight),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 11.0),
+                    child: TabBar(
+                      isScrollable: true,
+                      unselectedLabelColor: Colors.white,
+                      labelPadding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 16),
+                      labelColor: AppColors.black2,
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicator: RoundedTabBarIndicator(
+                        indicatorHeight: 32,
+                        indicatorColor: AppColors.brightYellow,
+                        tabBarIndicatorSize: TabBarIndicatorSize.tab,
+                      ),
+                      tabs: tabs,
+                      controller: _tabController,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -175,6 +290,24 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            "MUSIC",
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.yellow,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -204,7 +337,7 @@ class MostPlayedSongs extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               ...songs.expand(
-                (song) => [
+                    (song) => [
                   const SizedBox(width: AppDimensions.horizontalPadding),
                   SongCard(song: song),
                 ],

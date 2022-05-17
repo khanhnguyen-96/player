@@ -1,21 +1,24 @@
 import 'package:app/models/song.dart';
+import 'package:app/ui/widgets/big_song_row.dart';
 import 'package:app/ui/widgets/song_row.dart';
 import 'package:app/ui/widgets/typography.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-/// A simple song list to display a small amount of song rows.
+/// A bigger and simple song list to display a small amount of song rows.
 /// Not meant to be used for a great number for rows, in such a case
 /// use SliverList or something similar instead.
-class SimpleSongList extends StatelessWidget {
-  final Iterable<Song> songs;
+class BiggerSongList extends StatelessWidget {
+  final Iterable<Song>? songs;
+  final Iterable<Widget>? children;
   final String? headingText;
   final bool bordered;
   final void Function()? onHeaderTap;
 
-  const SimpleSongList({
+  const BiggerSongList({
     Key? key,
-    required this.songs,
+    this.songs,
+    this.children,
     this.headingText,
     this.bordered = false,
     this.onHeaderTap,
@@ -36,13 +39,11 @@ class SimpleSongList extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 16),
             ),
           ),
-        ...songs.map(
-          (song) => SongRow(
-            song: song,
-            bordered: bordered,
-            padding: const EdgeInsets.symmetric(horizontal: 0),
-          ),
-        )
+        if (songs != null)
+          ...songs!
+              .map((song) => BigSongRow(song: song))
+              .toList(growable: false),
+        if (children != null) ...children!,
       ],
     );
   }
